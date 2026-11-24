@@ -1,8 +1,36 @@
 import { createHash } from "crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { dirname } from "path";
+import { dirname, resolve } from "path";
 import OpenAI from "openai";
 import { ConsumerNeed, EdgeJudge, ScoredEdge, Tool } from "./types.js";
+
+/**
+ * Load environment variables from `.env` in the current working directory if present,
+ * without overwriting already-set environment variables.
+ */
+function loadDotEnv(): void {
+  const envPath = resolve(process.cwd(), ".env");
+  if (!existsSync(envPath)) return;
+  try {
+    const content = readFileSync(envPath, "utf-8");
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith("#")) continue;
+      const eqIdx = line.indexOf("=");
+      if (eqIdx === -1) continue;
+      const key = line.slice(0, eqIdx).trim();
+      const val = line
+        .slice(eqIdx + 1)
+        .trim()
+        .replace(/^['"]|['"]$/g, "");
+      if (key && process.env[key] === undefined) {
+        process.env[key] = val;
+      }
+    }
+  } catch {
+    // Ignore .env read errors
+  }
+}
 
 /**
  * Heuristic Judge (Fallback / Baseline in Chain of Responsibility).
@@ -243,18 +271,24 @@ export class FallbackJudge implements EdgeJudge {
 }
 
 /**
- * Factory Pattern: Creates the best available EdgeJudge based on environment credentials.
+ * Factory Pattern: Creates the best available EdgeJudge based on `.env` or environment credentials.
  */
 export function createEdgeJudge(): EdgeJudge {
+  loadDotEnv();
   const heuristic = new HeuristicJudge();
   const apiKey =
+    process.env.API_KEY ||
     process.env.LITMUS_ASSESSMENT_TOKEN ||
     process.env.OPENAI_API_KEY ||
     process.env.OPENROUTER_API_KEY;
   const litmusUrl = process.env.LITMUS_API_URL
     ? `${process.env.LITMUS_API_URL.replace(/\/$/, "")}/proxy/openai/v1`
     : undefined;
-  const baseURL = process.env.OPENAI_BASE_URL || litmusUrl || "https://api.openai.com/v1";
+  const baseURL =
+    process.env.BASE_URL ||
+    process.env.OPENAI_BASE_URL ||
+    litmusUrl ||
+    "https://api.openai.com/v1";
   const model = process.env.OPENAI_MODEL || "openai/gpt-4o";
 
   if (apiKey) {
