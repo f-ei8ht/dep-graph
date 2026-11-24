@@ -57,7 +57,7 @@ export class OpenAiJudge implements EdgeJudge {
   private client: OpenAI;
   private model: string;
 
-  constructor(baseURL: string, apiKey: string, model = "openai/gpt-4o-mini") {
+  constructor(baseURL: string, apiKey: string, model = "openai/gpt-4o") {
     this.client = new OpenAI({
       baseURL,
       apiKey,
@@ -255,7 +255,7 @@ export function createEdgeJudge(): EdgeJudge {
     ? `${process.env.LITMUS_API_URL.replace(/\/$/, "")}/proxy/openai/v1`
     : undefined;
   const baseURL = process.env.OPENAI_BASE_URL || litmusUrl || "https://api.openai.com/v1";
-  const model = process.env.OPENAI_MODEL || "openai/gpt-4o-mini";
+  const model = process.env.OPENAI_MODEL || "openai/gpt-4o";
 
   if (apiKey) {
     const llmJudge = new CachingJudge(new OpenAiJudge(baseURL, apiKey, model));
