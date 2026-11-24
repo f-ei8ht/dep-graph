@@ -1,5 +1,6 @@
 node_modules/
 .env*
+.cache/
 selfcheck_graph.json
 dependency_graph.json
 
