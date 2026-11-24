@@ -7196,16 +7196,6 @@
     },
     {
       "from": "GITHUB_LIST_ORG_ISSUES_FOR_THE_AUTHENTICATED_USER",
-      "to": "GITHUB_CHECK_IF_USER_CAN_BE_ASSIGNED_TO_ISSUE",
-      "label": "issue_number"
-    },
-    {
-      "from": "GITHUB_LIST_ORG_ISSUES_FOR_THE_AUTHENTICATED_USER",
-      "to": "GITHUB_CLOSE_ISSUE",
-      "label": "issue_number"
-    },
-    {
-      "from": "GITHUB_LIST_ORG_ISSUES_FOR_THE_AUTHENTICATED_USER",
       "to": "GITHUB_CREATE_AN_ISSUE_COMMENT",
       "label": "issue_number"
     },

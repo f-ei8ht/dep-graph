@@ -131,6 +131,7 @@ export class OpenAiJudge implements EdgeJudge {
       const response = await this.client.chat.completions.create({
         model: this.model,
         temperature: 0,
+        max_tokens: 1500,
         response_format: { type: "json_object" },
         messages: [
           {
